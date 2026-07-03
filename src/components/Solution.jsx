@@ -1,43 +1,43 @@
-import { BRAND } from "../data/content.js";
+import { useModel } from "../context/ModelContext.jsx";
+import { CheckIcon } from "./icons.jsx";
 
-// SECTION 3 — The solution
+// SECTION 3 — The solution. When the active model defines
+// `solution.features`, they render as a card grid (used by the
+// Fully Managed model); otherwise it's prose + a callout.
 export default function Solution() {
+  const { content } = useModel();
+  const { solution } = content;
+
   return (
     <section className="section section-alt">
       <div className="container">
         <div className="section-head">
-          <h2 className="section-title">
-            We find your person. You keep everything after that.
-          </h2>
+          <h2 className="section-title">{solution.title}</h2>
         </div>
 
         <div className="prose">
-          <p>
-            {BRAND} sources candidates from a private network we've built and
-            tested across our own companies. We run the skills tests, the
-            interviews, and the English and communication screening. We hand you
-            a shortlist of people who've already cleared the bar.
-          </p>
-          <p>
-            You pick who fits. From that point on, they're yours: you hire them
-            directly, you pay them directly, you manage them like any other
-            member of your team. We charge one flat placement fee for the work of
-            finding and vetting them — and that's the last you'll hear from our
-            billing.
-          </p>
-          <p>
-            No monthly subscription. No cut of their wage. No agency sitting
-            between you and your own employee.
-          </p>
+          {solution.prose.map((para, i) => (
+            <p key={i}>{para}</p>
+          ))}
         </div>
 
+        {solution.features && (
+          <div className="feature-grid">
+            {solution.features.map((feature) => (
+              <div className="feature-card" key={feature.title}>
+                <span className="feature-icon">
+                  <CheckIcon size={18} />
+                </span>
+                <h3>{feature.title}</h3>
+                <p>{feature.body}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className="callout">
-          <h4>What makes this different</h4>
-          <p>
-            Most staffing agencies mark up your worker's wage 3–5x, forever. We
-            don't touch their wage at all. You pay them what they earn, and you
-            pay us once for finding them. That's it.
-          </p>
+          <h4>{solution.callout.title}</h4>
+          <p>{solution.callout.body}</p>
         </div>
       </div>
     </section>

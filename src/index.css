@@ -11,6 +11,7 @@
   --accent: #c4801f;
   --accent-dark: #a96a12;
   --accent-soft: rgba(196, 128, 31, 0.1);
+  --accent-ring: rgba(196, 128, 31, 0.2);
   --border: #e7e3d9;
   --border-soft: #efece4;
 
@@ -19,6 +20,19 @@
 
   --radius: 10px;
   --maxw: 1080px;
+}
+
+/* ============================================================
+   PER-MODEL THEMING
+   The toggle sets data-model on the app root. "Fully Managed"
+   (Brand 2) shifts the accent from warm gold to electric blue,
+   so the whole palette moves with the toggle.
+   ============================================================ */
+[data-model="managed"] {
+  --accent: #2563eb;
+  --accent-dark: #1d4ed8;
+  --accent-soft: rgba(37, 99, 235, 0.1);
+  --accent-ring: rgba(37, 99, 235, 0.22);
 }
 
 * {
@@ -174,7 +188,7 @@ h2.section-title {
    HERO (section 1)
    ============================================================ */
 .hero {
-  padding: 96px 0 64px;
+  padding: 76px 0 64px;
   text-align: center;
 }
 .hero h1 {
@@ -439,7 +453,7 @@ h2.section-title {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: rgba(196, 128, 31, 0.2);
+  background: var(--accent-ring);
   color: var(--accent);
   display: flex;
   align-items: center;
@@ -662,6 +676,211 @@ h2.section-title {
 }
 
 /* ============================================================
+   MODEL TOGGLE
+   Lives in the navbar (right side) and switches the whole page
+   between the "Hire Yourself" and "Fully Managed" models.
+   ============================================================ */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.model-toggle {
+  position: relative;
+  display: inline-flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px;
+  box-shadow: 0 6px 20px rgba(20, 38, 59, 0.06);
+}
+.model-toggle-thumb {
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  bottom: 5px;
+  width: calc(50% - 5px);
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 6px 16px var(--accent-ring);
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.32s ease;
+  z-index: 0;
+}
+.model-toggle[data-index="1"] .model-toggle-thumb {
+  transform: translateX(100%);
+}
+.model-toggle-btn {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 0;
+  min-width: 152px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 9px 22px;
+  border-radius: 999px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--body);
+  transition: color 0.24s ease;
+}
+.model-toggle-btn .model-toggle-sub {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  opacity: 0.72;
+}
+.model-toggle-btn[data-active="true"] {
+  color: #fff;
+}
+.model-toggle-label,
+.model-toggle-sub {
+  white-space: nowrap;
+}
+.model-toggle {
+  flex-shrink: 0;
+}
+
+/* Smaller variant used inside the pricing section. */
+.model-toggle-sm .model-toggle-btn {
+  min-width: 138px;
+  padding: 8px 18px;
+}
+
+/* Entrance animation replayed each time the model changes. */
+.model-swap {
+  animation: modelSwapIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes modelSwapIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ============================================================
+   SOLUTION — feature cards (Fully Managed model)
+   ============================================================ */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  max-width: 960px;
+  margin: 40px auto 0;
+}
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+.feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 34px rgba(20, 38, 59, 0.08);
+  border-color: var(--accent);
+}
+.feature-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+.feature-card h3 {
+  font-size: 17px;
+  margin-bottom: 6px;
+}
+.feature-card p {
+  font-size: 14px;
+}
+
+/* ============================================================
+   PRICING — extras (toggle, featured row, unit, savings)
+   ============================================================ */
+.price-row.featured {
+  background: var(--accent-soft);
+  position: relative;
+}
+.popular-tag {
+  display: inline-block;
+  margin-left: 10px;
+  vertical-align: middle;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--accent);
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+.fee-unit {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-left: 2px;
+}
+.savings-callout {
+  max-width: 640px;
+  margin: 20px auto 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--accent-dark);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-ring);
+  border-radius: 12px;
+  padding: 14px 20px;
+}
+
+/* ============================================================
+   FAQ — search input
+   ============================================================ */
+.faq-search {
+  margin-bottom: 10px;
+}
+.faq-search input {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--ink);
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  transition: border-color 0.15s ease;
+}
+.faq-search input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.faq-empty {
+  padding: 22px 0;
+  color: var(--muted);
+  font-size: 16px;
+}
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (max-width: 820px) {
@@ -671,11 +890,27 @@ h2.section-title {
   .role-grid,
   .pillars,
   .cost-row,
-  .form-grid {
+  .form-grid,
+  .feature-grid {
     grid-template-columns: 1fr;
   }
   .section {
     padding: 60px 0;
+  }
+  .model-toggle-btn {
+    min-width: 130px;
+    padding: 8px 14px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .model-toggle-btn {
+    min-width: 118px;
+    padding: 8px 10px;
+  }
+  .model-toggle-btn .model-toggle-sub {
+    display: none;
   }
 }
 

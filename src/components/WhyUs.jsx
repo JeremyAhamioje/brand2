@@ -1,26 +1,24 @@
-import { BRAND, pillars } from "../data/content.js";
+import { useModel } from "../context/ModelContext.jsx";
 
 // SECTION 8 — Why us (three pillars)
 export default function WhyUs() {
+  const { content } = useModel();
+  const { why } = content;
+
   return (
     <section className="section section-alt">
       <div className="container">
         <div className="section-head">
-          <span className="eyebrow">Why {BRAND}</span>
-          <h2 className="section-title">
-            We're not a job board. We're operators who hire this way ourselves.
-          </h2>
+          <span className="eyebrow">{why.eyebrow}</span>
+          <h2 className="section-title">{why.title}</h2>
         </div>
 
         <div className="pillars">
-          {pillars.map((pillar) => (
+          {why.pillars.map((pillar) => (
             <div className="pillar" key={pillar.title}>
               <div className="marker" />
               <h3>{pillar.title}</h3>
-              <p>
-                {/* One pillar starts with the brand name, so we prepend it. */}
-                {pillar.leadWithBrand ? `${BRAND} ${pillar.body}` : pillar.body}
-              </p>
+              <p>{pillar.body}</p>
             </div>
           ))}
         </div>

@@ -1,38 +1,29 @@
+import { useModel } from "../context/ModelContext.jsx";
 import BookButton from "./BookButton.jsx";
-import { CheckIcon, ArrowDown } from "./icons.jsx";
+import { CheckIcon, ArrowRight } from "./icons.jsx";
 
-const trustPoints = [
-  "Flat one-time fee",
-  "Fluent, skills-tested talent",
-  "2-week money-back guarantee",
-  "Built by operators who staff their own companies this way",
-];
-
-// SECTION 1 — Hero
+// SECTION 1 — Hero. All copy comes from the active model, so the
+// headline, subhead, secondary CTA, and trust strip change when
+// the toggle is switched.
 export default function Hero() {
+  const { content } = useModel();
+  const { hero } = content;
+
   return (
     <header className="hero" id="top">
       <div className="container">
-        <span className="eyebrow">Hire remote. Pay once. Own the relationship.</span>
-        <h1>
-          Get a vetted remote professional for a fraction of a local hire — and
-          pay one flat fee, one time.
-        </h1>
-        <p className="subhead">
-          We source, test, and hand you a qualified bookkeeper, developer, sales
-          rep, or admin. You hire them directly, pay them directly, and manage
-          them as your own. One flat placement fee. No monthly markup on their
-          wage — ever.
-        </p>
+        <span className="eyebrow">{hero.eyebrow}</span>
+        <h1>{hero.headline}</h1>
+        <p className="subhead">{hero.subhead}</p>
         <div className="hero-actions">
           <BookButton large />
-          <a href="#how" className="btn-link">
-            See how it works <ArrowDown />
+          <a href={hero.secondaryCta.href} className="btn-link">
+            {hero.secondaryCta.label} <ArrowRight />
           </a>
         </div>
 
         <div className="trust-strip">
-          {trustPoints.map((point) => (
+          {hero.trust.map((point) => (
             <div className="trust-item" key={point}>
               <CheckIcon />
               <span>{point}</span>

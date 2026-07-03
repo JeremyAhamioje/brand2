@@ -1,19 +1,22 @@
 import { useState } from "react";
-import { roles } from "../data/content.js";
+import { useModel } from "../context/ModelContext.jsx";
 import BookButton from "./BookButton.jsx";
 
 // ============================================================
-// To make this form email you, sign up at https://formspree.io
-// (free), create a form, and paste the URL it gives you here.
-// Until then the form still works for previewing.
+// Submits to our /api/lead serverless function, which emails the
+// lead via Resend. The API key stays server-side (see /api/lead.js
+// and lib/sendLead.js) — set RESEND_API_KEY in .env / your host.
 // ============================================================
-const FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/abcdwxyz"
+const FORM_ENDPOINT = "/api/lead";
 
 const emptyForm = { name: "", email: "", role: "", details: "" };
 
 // SECTION 10 — Final CTA. The id="book" here is where every
 // "Book a call" button scrolls to when no booking link is set.
 export default function FinalCTA() {
+  const { model, content } = useModel();
+  const { finalCta, roles } = content;
+
   const [form, setForm] = useState(emptyForm);
   const [status, setStatus] = useState("idle");
 
@@ -24,8 +27,12 @@ export default function FinalCTA() {
     e.preventDefault();
     setStatus("sending");
 
+    // Include which model the visitor was viewing, so whatever
+    // backend you wire up later knows which offering they want.
+    const payload = { ...form, model };
+
     if (!FORM_ENDPOINT) {
-      console.log("Role details (no endpoint set yet):", form);
+      console.log("Role details (no endpoint set yet):", payload);
       setStatus("success");
       return;
     }
@@ -33,7 +40,7 @@ export default function FinalCTA() {
       const res = await fetch(FORM_ENDPOINT, {
         method: "POST",
         headers: { Accept: "application/json", "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
       if (res.ok) {
         setStatus("success");
@@ -50,12 +57,8 @@ export default function FinalCTA() {
     <section className="final-cta" id="book">
       <div className="container">
         <div className="final-inner">
-          <h2>Tell us the role. We'll bring you the person.</h2>
-          <p>
-            One call is all it takes to get started. We'll learn what you need,
-            and you'll have vetted candidates in hand within days — for one flat
-            fee, paid once.
-          </p>
+          <h2>{finalCta.title}</h2>
+          <p>{finalCta.body}</p>
           <div className="final-actions">
             <BookButton large />
           </div>
@@ -70,11 +73,8 @@ export default function FinalCTA() {
               </div>
             ) : (
               <form onSubmit={handleSubmit}>
-                <h3>Or send us the role details and we'll reach out</h3>
-                <p className="form-sub">
-                  Prefer not to book yet? Give us the basics and we'll be in
-                  touch.
-                </p>
+                <h3>{finalCta.formTitle}</h3>
+                <p className="form-sub">{finalCta.formSub}</p>
 
                 <div className="form-grid">
                   <div className="field">
@@ -112,7 +112,7 @@ export default function FinalCTA() {
                       <option value="" disabled>
                         Select a role
                       </option>
-                      {roles.map((r) => (
+                      {roles.items.map((r) => (
                         <option key={r.title}>{r.title}</option>
                       ))}
                       <option>Something else</option>

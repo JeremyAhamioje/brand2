@@ -1,139 +1,19 @@
 // ============================================================
-// YOUR CONTENT LIVES HERE
-// This is the single place to edit wording, prices, roles, and
-// the two most important settings below. Change something here
-// and it updates across the whole page.
+// SITE CONFIG — settings that DON'T change with the toggle.
+// The wording, pricing, roles, and FAQs now live per-model in
+//   src/data/models/hireYourself.js   (Hire Yourself / Brand 1)
+//   src/data/models/fullyManaged.js   (Fully Managed / Brand 2)
+// and are swapped live by the homepage toggle.
 // ============================================================
 
-// -- SETTING 1: your brand name ------------------------------
-// Replace this with your real business name. It appears in the
-// navbar, headings, and footer automatically.
-export const BRAND = "BRAND 1";
-
-// -- SETTING 2: your booking link ----------------------------
+// -- Booking link --------------------------------------------
 // Every "Book a call" button uses this. Paste your scheduling
 // link here (e.g. your Calendly URL). While it's left empty,
 // the buttons instead scroll down to the contact form at the
 // bottom of the page, so nothing breaks in the meantime.
 export const BOOKING_URL = ""; // e.g. "https://calendly.com/yourname/15min"
 
-// -- SECTION 4: roles we place -------------------------------
-export const roles = [
-  {
-    title: "Accounting & Bookkeeping",
-    desc: "Full-cycle bookkeeping, reconciliations, invoicing, AP/AR, and cleanup.",
-    bestFor:
-      "Accounting firms adding capacity, and any business that needs its books handled without a $55K hire.",
-  },
-  {
-    title: "Development & Automation",
-    desc: "Developers and automation specialists who build the workflows, integrations, and tools that eliminate manual work.",
-    bestFor:
-      "Businesses drowning in repetitive processes that should be automated.",
-  },
-  {
-    title: "Sales & Outreach",
-    desc: "Cold-email outreach, lead-pipeline generation, and sales support that keeps your funnel full.",
-    bestFor:
-      "Real estate management, trades, and services businesses that live or die by pipeline.",
-  },
-  {
-    title: "General Admin & Support",
-    desc: "Inbox and calendar management, data entry, customer service, and the day-to-day work that eats your team's hours.",
-    bestFor: "Owners and small teams buried in operational busywork.",
-  },
-];
-
-// -- SECTION 5: how it works ---------------------------------
-export const steps = [
-  {
-    title: "Tell us the role",
-    body: "On a short call, we learn the role, the skills, and what great looks like for you — the software they need, the English level, the hours, the personality. Your bar becomes our brief.",
-  },
-  {
-    title: "We source and vet",
-    body: "We pull from our private network and put candidates through skills testing, structured interviews, and communication screening. You only meet people who've already passed.",
-  },
-  {
-    title: "You interview and choose",
-    body: "We send you a shortlist. You interview the finalists and pick the one who fits. No pressure, no filler candidates.",
-  },
-  {
-    title: "You hire them directly",
-    body: "They join your team, on your terms, paid by you. You pay us one flat placement fee — and you're done with us on billing.",
-  },
-  {
-    title: "Try them risk-free for two weeks",
-    body: "If it's not a fit in the first two weeks, you get your money back. (See the guarantee below.)",
-  },
-];
-
-// -- SECTION 6: pricing --------------------------------------
-// [CONFIRM] Final fees before publishing.
-export const pricing = [
-  { role: "General Admin & Support", fee: "$2,250" },
-  { role: "Sales & Outreach", fee: "$2,700" },
-  { role: "Accounting & Bookkeeping", fee: "$3,300" },
-  { role: "Development & Automation", fee: "$4,800" },
-];
-
-// -- SECTION 8: why us (three pillars) -----------------------
-export const pillars = [
-  {
-    title: "We run our own companies on this model",
-    body: "was built by a team that has hired, tested, and managed remote professionals to build real, profitable businesses. We're not guessing what a great remote hire looks like — we depend on ours every day.",
-    leadWithBrand: true,
-  },
-  {
-    title: "A vetted network, not an open marketplace",
-    body: "Our candidates come from a private talent network we've developed across our operations — professionals in the Philippines, India, and Nigeria who've already proven themselves on real work. You're hiring from a bench, not fishing in a sea of unknown profiles.",
-  },
-  {
-    title: "We screen for what actually matters",
-    body: "Skills tests. Structured interviews. English and communication screening. And we calibrate every search to your definition of great — not a generic one — before a single candidate reaches you.",
-  },
-];
-
-// -- SECTION 9: FAQ ------------------------------------------
-// Items marked `draft: true` are placeholder answers written from
-// the document's notes. Review and confirm these before publishing.
-export const faqs = [
-  {
-    q: "Where are your professionals based?",
-    a: "Our network spans the Philippines, India, and Nigeria — regions with deep, skilled, English-fluent talent pools. We match you based on the role, the hours you need, and your communication requirements.",
-  },
-  {
-    q: "How does payment work?",
-    a: "You pay your professional their wage directly — we take no cut of it and never mark it up. You pay us one flat placement fee for finding and vetting them. That's the entire cost.",
-  },
-  {
-    q: "Who manages the person day-to-day?",
-    a: "You do. Once you hire them, they work as part of your team, on your systems, reporting to you — exactly like any other team member.",
-  },
-  {
-    q: "How do you vet candidates?",
-    a: "Every candidate goes through skills testing, a structured interview, and communication screening. Before we start, we align with you on exactly what the role requires, so you only meet people who clear your bar.",
-  },
-  {
-    q: "How fast can I get someone?",
-    a: "Because we source from an existing vetted network instead of starting from scratch, most roles are filled in days — not the weeks or months a traditional hire takes.",
-  },
-  {
-    q: "What if it doesn't work out?",
-    a: "Your first two weeks are covered by our money-back guarantee. If it's not a fit, we refund your placement fee — provided you part ways with the person.",
-  },
-  {
-    q: "What stops me from just hiring the person and not paying you?",
-    a: "Our placement agreement includes a standard non-circumvention clause: anyone we introduce to you is covered, so the fee is owed if you hire them. In practice, our clients don't want to — the fee is small, one-time, and the vetting we've done is the value.",
-  },
-  {
-    q: "What hours will they work?",
-    a: "We match to your required hours, including US-hours coverage where needed. Back-office roles like bookkeeping, admin, and development are flexible; live roles such as customer service and sales calls are staffed to overlap with your working day.",
-    draft: true,
-  },
-  {
-    q: "Is my data safe?",
-    a: "Every professional signs an NDA before they begin, and for sensitive roles like accounting and customer service we'll align with you on access controls and data-handling practices. We'll cover your specific requirements on the call.",
-    draft: true,
-  },
-];
+// -- Which model shows first ---------------------------------
+// "managed" = Fully Managed (Brand 2) is selected on load.
+// "hire"    = Hire Yourself (Brand 1) is selected on load.
+export const DEFAULT_MODEL = "managed";
