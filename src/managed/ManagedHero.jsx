@@ -1,7 +1,7 @@
 import { Suspense, lazy } from "react";
 import { useModel } from "../context/ModelContext.jsx";
-import { BOOKING_URL } from "../data/content.js";
 import { usePrefersReducedMotion, useEnable3D } from "./hooks.js";
+import { BookLink } from "./booking.jsx";
 import { CheckIcon, ArrowRight } from "../components/icons.jsx";
 import globePoster from "./assets/globe-poster.png";
 
@@ -15,10 +15,6 @@ export default function ManagedHero() {
   const { hero } = content;
   const reduced = usePrefersReducedMotion();
   const enable3D = useEnable3D();
-  const bookHref = BOOKING_URL || "#book";
-  const bookProps = BOOKING_URL
-    ? { target: "_blank", rel: "noopener noreferrer" }
-    : {};
 
   return (
     <header className="m-hero" id="top">
@@ -71,9 +67,9 @@ export default function ManagedHero() {
         <div className="m-hero-br">
           <p className="m-hero-sub">{hero.subhead}</p>
           <div className="m-hero-actions">
-            <a href={bookHref} className="m-btn m-btn-primary m-btn-lg" {...bookProps}>
+            <BookLink className="m-btn m-btn-primary m-btn-lg">
               Book a 15-minute call <ArrowRight />
-            </a>
+            </BookLink>
             <a href="#pricing" className="m-btn m-btn-ghost m-btn-lg">
               See pricing
             </a>

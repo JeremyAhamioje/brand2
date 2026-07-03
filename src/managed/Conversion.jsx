@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useModel } from "../context/ModelContext.jsx";
-import { BOOKING_URL } from "../data/content.js";
 import Reveal from "./Reveal.jsx";
+import { BookLink } from "./booking.jsx";
 import { CheckIcon, ArrowRight, ShieldIcon, Chevron } from "../components/icons.jsx";
 
 // Same set of inclusions applies to every managed plan.
@@ -18,10 +18,6 @@ const INCLUDED = [
 export function Pricing() {
   const { content } = useModel();
   const { pricing } = content;
-  const bookHref = BOOKING_URL || "#book";
-  const bookProps = BOOKING_URL
-    ? { target: "_blank", rel: "noopener noreferrer" }
-    : {};
 
   return (
     <section className="m-section" id="pricing">
@@ -72,9 +68,9 @@ export function Pricing() {
             {pricing.valueFrame}
           </Reveal>
           <Reveal delay={0.1} style={{ marginTop: 28 }}>
-            <a href={bookHref} className="m-btn m-btn-primary m-btn-lg" {...bookProps}>
+            <BookLink className="m-btn m-btn-primary m-btn-lg">
               {pricing.cta} <ArrowRight />
-            </a>
+            </BookLink>
           </Reveal>
         </div>
       </div>
@@ -218,10 +214,6 @@ export function CTA() {
   const { finalCta, roles } = content;
   const [form, setForm] = useState(emptyForm);
   const [status, setStatus] = useState("idle");
-  const bookHref = BOOKING_URL || "#cta-form";
-  const bookProps = BOOKING_URL
-    ? { target: "_blank", rel: "noopener noreferrer" }
-    : {};
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -256,12 +248,15 @@ export function CTA() {
             <div className="m-bg-grid" />
           </div>
           <div style={{ position: "relative", zIndex: 1 }}>
+            <span className="m-eyebrow" style={{ marginBottom: 14 }}>
+              For companies hiring
+            </span>
             <h2>{finalCta.title}</h2>
             <p>{finalCta.body}</p>
             <div className="m-cta-actions">
-              <a href={bookHref} className="m-btn m-btn-primary m-btn-lg" {...bookProps}>
+              <BookLink className="m-btn m-btn-primary m-btn-lg" fallback="#cta-form">
                 Book a 15-minute call <ArrowRight />
-              </a>
+              </BookLink>
               <a href="#cta-form" className="m-btn m-btn-ghost m-btn-lg">
                 Tell us about your needs
               </a>
@@ -353,6 +348,64 @@ export function CTA() {
 }
 
 // ============================================================
+// NEWSLETTER (footer) — adds the email to a Resend Audience
+// ============================================================
+function NewsletterForm() {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState("idle");
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setStatus("sending");
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (res.ok) {
+        setStatus("success");
+        setEmail("");
+      } else {
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
+    }
+  };
+
+  if (status === "success") {
+    return <p className="m-news-note">Thanks — you're subscribed. ✦</p>;
+  }
+
+  return (
+    <form className="m-news" onSubmit={submit}>
+      <span className="m-news-label">Get occasional updates</span>
+      <div className="m-news-row">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@company.com"
+          aria-label="Email address"
+          required
+        />
+        <button
+          type="submit"
+          className="m-btn m-btn-primary"
+          disabled={status === "sending"}
+        >
+          {status === "sending" ? "…" : "Subscribe"}
+        </button>
+      </div>
+      {status === "error" && (
+        <p className="m-news-note err">Couldn't subscribe — please try again.</p>
+      )}
+    </form>
+  );
+}
+
+// ============================================================
 // FOOTER
 // ============================================================
 const FOOTER_COLS = [
@@ -379,6 +432,7 @@ export function Footer() {
               manage dedicated remote professionals — so you get the output
               without the operational burden.
             </p>
+            <NewsletterForm />
           </div>
           {FOOTER_COLS.map((col) => (
             <div className="m-footer-col" key={col.h}>

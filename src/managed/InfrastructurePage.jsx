@@ -1,9 +1,10 @@
 import { useModel } from "../context/ModelContext.jsx";
-import { BOOKING_URL } from "../data/content.js";
 import Reveal from "./Reveal.jsx";
 import ManagedNav from "./ManagedNav.jsx";
 import { Footer } from "./Conversion.jsx";
 import SceneBackground from "./SceneBackground.jsx";
+import StickyBook from "./StickyBook.jsx";
+import { BookLink } from "./booking.jsx";
 import { ArrowRight, CheckIcon, ShieldIcon } from "../components/icons.jsx";
 import plfPayroll from "./assets/platform/payroll.webp";
 import plfDashboard from "./assets/platform/dashboard.webp";
@@ -134,10 +135,6 @@ const TRUST = [
 
 export default function InfrastructurePage() {
   const { content } = useModel();
-  const bookHref = BOOKING_URL || "#book";
-  const bookProps = BOOKING_URL
-    ? { target: "_blank", rel: "noopener noreferrer" }
-    : {};
 
   return (
     <div className="managed">
@@ -166,9 +163,9 @@ export default function InfrastructurePage() {
               the output of a great hire without any of the operational load.
             </p>
             <div className="m-hero-actions">
-              <a href={bookHref} className="m-btn m-btn-primary m-btn-lg" {...bookProps}>
+              <BookLink className="m-btn m-btn-primary m-btn-lg">
                 Book a 15-minute call <ArrowRight />
-              </a>
+              </BookLink>
               <a href="#stack" className="m-btn m-btn-ghost m-btn-lg">
                 See everything included
               </a>
@@ -349,9 +346,9 @@ export default function InfrastructurePage() {
                 management, and replacement cover all included from day one.
               </p>
               <div className="m-cta-actions">
-                <a href={bookHref} className="m-btn m-btn-primary m-btn-lg" {...bookProps}>
+                <BookLink className="m-btn m-btn-primary m-btn-lg">
                   Book a 15-minute call <ArrowRight />
-                </a>
+                </BookLink>
                 <a href="#home" className="m-btn m-btn-ghost m-btn-lg">
                   Back to overview
                 </a>
@@ -362,6 +359,7 @@ export default function InfrastructurePage() {
       </section>
 
       <Footer />
+      <StickyBook />
     </div>
   );
 }

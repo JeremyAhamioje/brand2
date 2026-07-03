@@ -1387,7 +1387,7 @@
 }
 .m-footer-grid {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  grid-template-columns: 1.6fr repeat(4, 1fr);
   gap: 40px;
   margin-bottom: 48px;
 }
@@ -1416,6 +1416,56 @@
   color: var(--m-muted);
   max-width: 300px;
   margin-top: 16px;
+}
+
+/* Newsletter signup (footer) */
+.m-news {
+  margin-top: 22px;
+  max-width: 340px;
+}
+.m-news-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--m-ink);
+  margin-bottom: 10px;
+}
+.m-news-row {
+  display: flex;
+  gap: 8px;
+}
+.m-news-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--m-line-2);
+  background: var(--m-glass);
+  color: var(--m-ink);
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.m-news-row input::placeholder {
+  color: var(--m-muted);
+}
+.m-news-row input:focus {
+  border-color: var(--m-accent);
+  background: var(--m-glass-2);
+}
+.m-news-row .m-btn {
+  flex-shrink: 0;
+}
+.m-news-note {
+  margin-top: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--m-accent-2);
+}
+.m-news-note.err {
+  color: #ff9a9a;
 }
 .m-footer-bottom {
   display: flex;
@@ -1725,12 +1775,19 @@
     order: 0;
   }
   .m-gtee-cards,
-  .m-footer-grid,
   .m-roles-infra,
   .m-how-grid,
   .m-ob-hero-grid,
   .m-ob-phase {
     grid-template-columns: 1fr;
+  }
+  /* Footer: brand/newsletter full width, link columns 2-up. */
+  .m-footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 30px 24px;
+  }
+  .m-footer-col:first-child {
+    grid-column: 1 / -1;
   }
   .m-gtee-card.low {
     margin-top: 0;
@@ -1773,6 +1830,55 @@
   .m-float-card {
     font-size: 12px;
     padding: 9px 12px;
+  }
+  .m-footer-grid {
+    gap: 26px 20px;
+  }
+  .m-footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .m-news {
+    max-width: 100%;
+  }
+}
+
+/* ============================================================
+   STICKY BOOK-A-CALL CTA
+   A persistent booking prompt that fades in after the hero, so the
+   primary action is always one tap away. Hidden while the big final
+   CTA is on screen (see StickyBook.jsx). On phones it becomes a
+   full-width bottom bar.
+   ============================================================ */
+.m-sticky-cta {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 40;
+  opacity: 0;
+  transform: translateY(16px);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.m-sticky-cta.show {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.m-sticky-cta .m-btn {
+  box-shadow: 0 16px 42px rgba(6, 8, 15, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+@media (max-width: 640px) {
+  .m-sticky-cta {
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+  }
+  .m-sticky-cta .m-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 

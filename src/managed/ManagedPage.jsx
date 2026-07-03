@@ -7,6 +7,7 @@ import { Pricing, Guarantee, FAQ, CTA, Footer } from "./Conversion.jsx";
 import OnboardingPage from "./OnboardingPage.jsx";
 import InfrastructurePage from "./InfrastructurePage.jsx";
 import SceneBackground from "./SceneBackground.jsx";
+import StickyBook from "./StickyBook.jsx";
 
 // A tiny hash "route": #onboarding and #infrastructure each show a
 // dedicated page; any other hash (or none) shows the managed home.
@@ -62,6 +63,7 @@ export default function ManagedPage() {
       <Logos />
       <Stats />
       <Footer />
+      <StickyBook />
     </div>
   );
 }

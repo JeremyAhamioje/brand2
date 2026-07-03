@@ -1,10 +1,11 @@
 import { Suspense, lazy, useEffect, useState } from "react";
-import { BOOKING_URL } from "../data/content.js";
 import { usePrefersReducedMotion, useEnable3D } from "./hooks.js";
 import Reveal from "./Reveal.jsx";
 import ManagedNav from "./ManagedNav.jsx";
 import { Footer } from "./Conversion.jsx";
 import SceneBackground from "./SceneBackground.jsx";
+import StickyBook from "./StickyBook.jsx";
+import { BookLink } from "./booking.jsx";
 import { ArrowRight, CheckIcon } from "../components/icons.jsx";
 import orbitPoster from "./assets/orbit-poster.png";
 
@@ -48,10 +49,6 @@ export default function OnboardingPage() {
   const reduced = usePrefersReducedMotion();
   const enable3D = useEnable3D();
   const [active, setActive] = useState(0);
-  const bookHref = BOOKING_URL || "#book";
-  const bookProps = BOOKING_URL
-    ? { target: "_blank", rel: "noopener noreferrer" }
-    : {};
 
   // Gently cycle the orbit highlight in the hero (only when the 3D
   // model is actually mounted).
@@ -90,9 +87,9 @@ export default function OnboardingPage() {
               step handled for you.
             </p>
             <div className="m-hero-actions">
-              <a href={bookHref} className="m-btn m-btn-primary m-btn-lg" {...bookProps}>
+              <BookLink className="m-btn m-btn-primary m-btn-lg">
                 Book a 15-minute call <ArrowRight />
-              </a>
+              </BookLink>
               <a href="#phases" className="m-btn m-btn-ghost m-btn-lg">
                 See the process
               </a>
@@ -167,9 +164,9 @@ export default function OnboardingPage() {
                 process — with a shortlist in your inbox within days.
               </p>
               <div className="m-cta-actions">
-                <a href={bookHref} className="m-btn m-btn-primary m-btn-lg" {...bookProps}>
+                <BookLink className="m-btn m-btn-primary m-btn-lg">
                   Book a 15-minute call <ArrowRight />
-                </a>
+                </BookLink>
                 <a href="#home" className="m-btn m-btn-ghost m-btn-lg">
                   Back to overview
                 </a>
@@ -180,6 +177,7 @@ export default function OnboardingPage() {
       </section>
 
       <Footer />
+      <StickyBook />
     </div>
   );
 }

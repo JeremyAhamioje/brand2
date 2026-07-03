@@ -12,7 +12,7 @@ export const fullyManaged = {
 
   // -- SECTION 1: Hero ---------------------------------------
   hero: {
-    eyebrow: "Fully managed remote staffing",
+    eyebrow: "For companies hiring · Fully managed staffing",
     headline:
       "A dedicated remote professional, fully managed — for one flat monthly price.",
     subhead:
@@ -208,7 +208,7 @@ export const fullyManaged = {
       "Save 40–60% vs. a comparable US hire — with payroll and management handled for you.",
     valueFrame:
       "A comparable US hire runs $5,000–$9,000+ per month fully loaded — before payroll admin, benefits, software, and management overhead. You get the same output, fully managed, for one predictable flat rate.",
-    cta: "Book a call to scope your role",
+    cta: "Book a call to build your team",
   },
 
   // -- SECTION 7: Guarantee ----------------------------------
@@ -288,9 +288,9 @@ export const fullyManaged = {
 
   // -- SECTION 10: Final CTA ---------------------------------
   finalCta: {
-    title: "Ready for a dedicated teammate, fully managed?",
-    body: "Book a 15-minute call. We'll learn your needs and match you with a vetted professional — payroll, management, and replacement cover all included.",
-    formTitle: "Or tell us about your needs and we'll reach out",
+    title: "Ready to add a dedicated teammate to your team?",
+    body: "Tell us the role you're hiring for and we'll match you with a vetted professional who works only for your business — payroll, management, and replacement cover all included.",
+    formTitle: "Or tell us about the role you're hiring for",
     formSub: "Prefer not to book yet? Give us the basics and we'll be in touch.",
   },
 };
