@@ -7,94 +7,46 @@ import SceneBackground from "./SceneBackground.jsx";
 import { ArrowRight, CheckIcon, ShieldIcon } from "../components/icons.jsx";
 import plfPayroll from "./assets/platform/payroll.webp";
 import plfDashboard from "./assets/platform/dashboard.webp";
+import feat1 from "./assets/features/feat1.webp";
 import feat2 from "./assets/features/feat2.webp";
+import feat3 from "./assets/features/feat3.webp";
+import feat4 from "./assets/features/feat4.webp";
+import feat5 from "./assets/features/feat5.webp";
+import feat6 from "./assets/features/feat6.webp";
 
 // "Everything we handle" — a dedicated deep-dive on the managed
 // infrastructure, structured like Deel's solution/engine pages.
-// Homepage images are reused as placeholders.
-
-// -- Local pillar icons (line style, matches the icon set) --------
-function IconRecruit() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="9" cy="8" r="4" />
-      <path d="M2 21c0-3.9 3.1-7 7-7 1.9 0 3.6.7 4.9 2" />
-      <path d="M16 11l2 2 4-4" />
-    </svg>
-  );
-}
-function IconPayroll() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="5" width="20" height="14" rx="2" />
-      <circle cx="12" cy="12" r="3" />
-      <path d="M6 9h.01M18 15h.01" />
-    </svg>
-  );
-}
-function IconCompliance() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-      <path d="M14 2v6h6" />
-      <path d="M9 15l2 2 4-4" />
-    </svg>
-  );
-}
-function IconOnboard() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 2v14" />
-      <path d="M7 11l5 5 5-5" />
-      <path d="M4 20h16" />
-    </svg>
-  );
-}
-function IconPerf() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 3v18h18" />
-      <path d="M7 14l3-3 3 3 5-6" />
-    </svg>
-  );
-}
-function IconCover() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20 12a8 8 0 1 0-3 6.2" />
-      <path d="M20 6v6h-6" />
-    </svg>
-  );
-}
+// Homepage images are reused as placeholders (they don't need to
+// match each pillar literally).
 
 const CAPABILITIES = [
   {
-    icon: <IconRecruit />,
+    image: feat1,
     title: "Recruiting & vetting",
     body: "We source from a private, vetted network and screen for skills, communication, and fit — so you only ever meet finalists.",
   },
   {
-    icon: <IconPayroll />,
+    image: feat3,
     title: "Payroll & taxes",
     body: "We employ and pay your professional and run taxes across every region. You never touch a payslip or a filing.",
   },
   {
-    icon: <IconCompliance />,
+    image: feat5,
     title: "HR & compliance",
     body: "Contracts, NDAs, and local compliance handled in-house across 40+ countries, kept current as rules change.",
   },
   {
-    icon: <IconOnboard />,
+    image: feat2,
     title: "Onboarding",
     body: "From signed offer to first paycheck we run equipment, access, and a structured week-one plan onto your tools.",
   },
   {
-    icon: <IconPerf />,
+    image: feat6,
     title: "Performance management",
     body: "A dedicated success manager, structured reviews, and weekly reporting keep every hire on track and visible.",
   },
   {
-    icon: <IconCover />,
+    image: feat4,
     title: "Cover & replacement",
     body: "Time off, sickness, and the replacement guarantee are ours to solve — your output never has to stop.",
   },
@@ -267,7 +219,9 @@ export default function InfrastructurePage() {
           <div className="m-inf-cap-grid">
             {CAPABILITIES.map((c, i) => (
               <Reveal className="m-inf-cap" key={c.title} delay={(i % 3) * 0.07}>
-                <span className="m-inf-cap-ic">{c.icon}</span>
+                <div className="m-inf-cap-img">
+                  <img src={c.image} alt="" loading="lazy" />
+                </div>
                 <h3>{c.title}</h3>
                 <p>{c.body}</p>
               </Reveal>
