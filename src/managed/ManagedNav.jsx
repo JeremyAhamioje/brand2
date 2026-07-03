@@ -1,12 +1,10 @@
 import { useModel } from "../context/ModelContext.jsx";
 import { BOOKING_URL } from "../data/content.js";
 import { useScrolled } from "./hooks.js";
-import ModelToggle from "../components/ModelToggle.jsx";
 import { ArrowRight } from "../components/icons.jsx";
 
 // Managed-product navbar. Becomes frosted glass once the page is
-// scrolled. Carries the model toggle so visitors can jump back to
-// the Hire Yourself product.
+// scrolled.
 export default function ManagedNav() {
   const { content } = useModel();
   const scrolled = useScrolled(10);
@@ -29,7 +27,6 @@ export default function ManagedNav() {
         </div>
 
         <div className="m-nav-right">
-          <ModelToggle size="sm" />
           <a
             href={bookHref}
             className="m-btn m-btn-primary"

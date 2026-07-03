@@ -1,21 +1,14 @@
 // ============================================================
-// MODEL 2 — "FULLY MANAGED" (Brand 2)
+// CONTENT — "FULLY MANAGED" (Brand 2)
 // A premium managed staffing model: we recruit, vet, onboard,
 // pay, and manage a dedicated remote professional for one flat
 // monthly price. Payroll, HR, performance, and cover are ours.
-// Same section schema as hireYourself.js — the toggle swaps
-// this whole object into every section on the homepage.
+// This object is the single source of copy for every section.
 // ============================================================
 
 export const fullyManaged = {
   id: "managed",
   name: "BRAND 2",
-
-  // Label shown on the homepage toggle.
-  toggle: {
-    label: "Fully Managed",
-    sub: "Flat monthly, all-in",
-  },
 
   // -- SECTION 1: Hero ---------------------------------------
   hero: {

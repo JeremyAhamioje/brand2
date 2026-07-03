@@ -1,8 +1,7 @@
 /* ============================================================
-   FULLY MANAGED (Brand 2) — a separate, dark, premium design
-   system. Everything is scoped under `.managed` so it never
-   touches the Hire Yourself page. Inspiration: Deel, Stripe,
-   Linear, Vercel. Enterprise operations platform, not agency.
+   FULLY MANAGED — a dark, premium design system. Everything is
+   scoped under `.managed`. Inspiration: Deel, Stripe, Linear,
+   Vercel. Enterprise operations platform, not agency.
    ============================================================ */
 .managed {
   --m-bg: #06080f;

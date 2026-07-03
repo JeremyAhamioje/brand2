@@ -1,13 +1,9 @@
-# Brand landing — dual-model homepage
+# Fully Managed — remote staffing landing page
 
-A React + Vite landing page with a **toggle** that switches the entire page
-between two engagement models, live, without navigating away:
-
-- **Hire Yourself** (Brand 1) — we vet, you hire/pay/manage directly, one flat one-time fee.
-- **Fully Managed** (Brand 2) — a dedicated professional we recruit, onboard, pay, and manage for one flat monthly price.
-
-Switching the toggle changes the brand name, accent color, hero, problem,
-solution, roles, onboarding flow, pricing, guarantee, why-us, FAQ, and CTA.
+A React + Vite marketing site for a **fully managed** remote-staffing product:
+we recruit, vet, onboard, pay, and manage a dedicated remote professional for
+one flat monthly price. Dark, premium enterprise design with an interactive
+Three.js globe.
 
 ## Run it
 
@@ -18,62 +14,69 @@ npm run build    # production build → dist/
 npm run preview  # preview the build
 ```
 
-## How the toggle works
+## Structure
 
 ```
 src/
 ├─ data/
-│  ├─ content.js              # shared config: BOOKING_URL, DEFAULT_MODEL
+│  ├─ content.js              # global config: BOOKING_URL
 │  └─ models/
-│     ├─ hireYourself.js      # ALL copy/pricing/FAQ for Brand 1
-│     ├─ fullyManaged.js      # ALL copy/pricing/FAQ for Brand 2
-│     └─ index.js             # MODELS registry + MODEL_ORDER (toggle order)
+│     └─ fullyManaged.js      # ALL copy/pricing/FAQ — the single content source
 ├─ context/
-│  └─ ModelContext.jsx        # holds active model; exposes resolved `content`
+│  └─ ModelContext.jsx        # thin `useModel()` accessor for the content object
 ├─ components/
-│  ├─ ModelToggle.jsx         # the segmented toggle control
-│  ├─ Hero / Problem / Solution / Roles / HowItWorks /
-│  │  Pricing / Guarantee / WhyUs / FAQ / FinalCTA   # pure renderers of `content`
-│  └─ Navbar / Footer / BookButton / icons
-├─ pages/
-│  └─ HomePage.jsx            # mode-bar + key-swapped section stack
-└─ App.jsx                    # shell; sets data-model for accent theming
+│  └─ icons.jsx               # shared inline SVG icons
+├─ managed/                   # the entire experience (dark design system)
+│  ├─ ManagedPage.jsx         # page shell + hash routing (#onboarding, #infrastructure)
+│  ├─ ManagedNav / ManagedHero / Sections / Conversion   # sections
+│  ├─ OnboardingPage / InfrastructurePage                # standalone sub-pages
+│  ├─ Globe.jsx / OrbitModel.jsx                          # Three.js visuals
+│  ├─ SceneBackground.jsx     # scroll-driven black↔cream background
+│  ├─ managed.css             # scoped design system (`.managed`)
+│  └─ assets/                 # images + earth texture
+└─ App.jsx                    # renders <ManagedPage />
 ```
 
-- **Content is data.** Every section reads `useModel().content.<section>`.
-  Both models share the same schema (see the two files in `data/models/`),
-  so editing copy never touches a component — just the data file.
-- **Theming** is driven by `data-model` on the app root (`App.jsx`).
-  `index.css` swaps the `--accent*` CSS variables for the Fully Managed model
-  (warm gold → electric blue), so the whole palette moves with the toggle.
-- **The swap animation** comes from `key={model}` on the section wrapper in
-  `HomePage.jsx`, which replays a subtle entrance each time the model changes.
+- **Content is data.** Every section reads `useModel().content.<section>`
+  from `src/data/models/fullyManaged.js` — editing copy never touches a
+  component.
+- **Routing** is a tiny hash router in `ManagedPage.jsx`: `#onboarding` and
+  `#infrastructure` render dedicated pages; every other hash is an in-page
+  anchor.
+- **Color transitions** are handled by `SceneBackground.jsx`, a fixed
+  full-viewport layer that fades between dark and cream as `.m-light` sections
+  cross the viewport.
 
-### Change what shows first
+## Configuration
 
-`src/data/content.js` → `DEFAULT_MODEL` (`"managed"` or `"hire"`).
+### Booking link
 
-### Wire up the booking link / form
+`BOOKING_URL` in `src/data/content.js` — set to your Calendly/scheduler URL and
+every "Book a call" button uses it. Left empty, buttons scroll to the contact
+form at the bottom of the page.
 
-- `BOOKING_URL` in `src/data/content.js` — set to your Calendly/scheduler URL
-  and every "Book a call" button uses it. Left empty, buttons scroll to the
-  contact form. The form submission payload includes the selected `model`.
-- `FORM_ENDPOINT` in `src/components/FinalCTA.jsx` — paste a Formspree (or
-  similar) URL to receive submissions by email.
+### Contact form → email (Resend)
 
-## The two products
+Form submissions POST to a serverless function that emails the lead via
+[Resend](https://resend.com). **The API key is server-side only — never in the
+client bundle.**
 
-The toggle swaps between two **completely different** experiences:
+- `api/lead.js` — serverless function (Vercel-style) that receives the form.
+- `lib/sendLead.js` — shared sender (validation + Resend call).
+- `vite.config.js` — dev middleware so `/api/lead` also works under `vite dev`.
 
-- **Hire Yourself (Brand 1)** — the warm, editorial page in `src/components/` +
-  `src/pages/HomePage.jsx`.
-- **Fully Managed (Brand 2)** — a dark, premium enterprise experience in
-  `src/managed/`, with its own design system (`managed.css`), tight grotesque
-  typography (Hanken Grotesk), and an interactive Three.js globe.
+Set these environment variables (copy `.env.example` → `.env` locally, and set
+them in your host's dashboard for production):
 
-`App.jsx` renders one or the other based on `model`.
+| Variable          | Purpose                                                        |
+| ----------------- | ------------------------------------------------------------- |
+| `RESEND_API_KEY`  | Your Resend API key.                                          |
+| `LEAD_TO_EMAIL`   | Where lead emails are delivered.                             |
+| `LEAD_FROM_EMAIL` | Verified sender. Until you verify a domain in Resend, the default `onboarding@resend.dev` only delivers to your own Resend account email. |
 
-### The globe (`src/managed/Globe.jsx`)
+`.env` is gitignored so the key is never committed.
+
+## The globe (`src/managed/Globe.jsx`)
 
 - Built with `three` + `@react-three/fiber` (drei is intentionally not used;
   OrbitControls comes straight from `three/examples`).
@@ -84,8 +87,7 @@ The toggle swaps between two **completely different** experiences:
   animated great-circle arcs with particles flowing along them, and each node
   carries a billboarded **country label block** that fades out on the far side.
 - It's lazy-loaded (`React.lazy`) into its own chunk, and honours
-  `prefers-reduced-motion` (no auto-rotation / particle motion, on-demand
-  rendering).
+  `prefers-reduced-motion`.
 
 To swap the globe texture, drop a new equirectangular Earth image at
 `src/managed/assets/earth-dark.jpg` (land brighter than ocean); tune the
