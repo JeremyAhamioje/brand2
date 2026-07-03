@@ -1,11 +1,12 @@
 import { Suspense, lazy, useEffect, useState } from "react";
 import { BOOKING_URL } from "../data/content.js";
-import { usePrefersReducedMotion } from "./hooks.js";
+import { usePrefersReducedMotion, useEnable3D } from "./hooks.js";
 import Reveal from "./Reveal.jsx";
 import ManagedNav from "./ManagedNav.jsx";
 import { Footer } from "./Conversion.jsx";
 import SceneBackground from "./SceneBackground.jsx";
 import { ArrowRight, CheckIcon } from "../components/icons.jsx";
+import orbitPoster from "./assets/orbit-poster.png";
 
 const OrbitModel = lazy(() => import("./OrbitModel.jsx"));
 
@@ -45,21 +46,23 @@ const PHASES = [
 
 export default function OnboardingPage() {
   const reduced = usePrefersReducedMotion();
+  const enable3D = useEnable3D();
   const [active, setActive] = useState(0);
   const bookHref = BOOKING_URL || "#book";
   const bookProps = BOOKING_URL
     ? { target: "_blank", rel: "noopener noreferrer" }
     : {};
 
-  // Gently cycle the orbit highlight in the hero.
+  // Gently cycle the orbit highlight in the hero (only when the 3D
+  // model is actually mounted).
   useEffect(() => {
-    if (reduced) return;
+    if (reduced || !enable3D) return;
     const id = setInterval(
       () => setActive((a) => (a + 1) % PHASES.length),
       2600
     );
     return () => clearInterval(id);
-  }, [reduced]);
+  }, [reduced, enable3D]);
 
   return (
     <div className="managed">
@@ -97,13 +100,22 @@ export default function OnboardingPage() {
           </div>
 
           <div className="m-how-stage m-ob-stage">
-            <Suspense fallback={<div className="m-how-fallback" />}>
-              <OrbitModel
-                steps={PHASES.map((p) => p.short)}
-                active={active}
-                reduced={reduced}
+            {enable3D ? (
+              <Suspense fallback={<div className="m-how-fallback" />}>
+                <OrbitModel
+                  steps={PHASES.map((p) => p.short)}
+                  active={active}
+                  reduced={reduced}
+                />
+              </Suspense>
+            ) : (
+              <img
+                className="m-how-poster"
+                src={orbitPoster}
+                alt="Onboarding process shown as concentric orbits"
+                loading="lazy"
               />
-            </Suspense>
+            )}
           </div>
         </div>
       </header>

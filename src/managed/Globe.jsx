@@ -428,8 +428,12 @@ function GlobeScene({ reduced, dots }) {
 }
 
 // Default export: loads + samples the land map, then renders the scene.
-export default function Globe({ reduced = false }) {
+export default function Globe({ reduced = false, onReady }) {
   const [dots, setDots] = useState(null);
+  const [active, setActive] = useState(true);
+  const wrapRef = useRef(null);
+  const readyCb = useRef(onReady);
+  readyCb.current = onReady;
 
   useEffect(() => {
     let alive = true;
@@ -437,21 +441,41 @@ export default function Globe({ reduced = false }) {
     img.src = earthUrl;
     img.onload = () => {
       const positions = buildLandDots(img);
-      if (alive) setDots(positions);
+      if (alive) {
+        setDots(positions);
+        readyCb.current?.();
+      }
     };
     return () => {
       alive = false;
     };
   }, []);
 
+  // Pause the WebGL render loop while the globe is off-screen. A
+  // continuous rAF loop otherwise keeps saturating the main thread
+  // as you scroll down the page, which shows up as poor INP on
+  // interactions far below the hero (e.g. the contact form).
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      ([entry]) => setActive(entry.isIntersecting),
+      { rootMargin: "100px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <Canvas
-      camera={{ position: [0, 0.35, 3.0], fov: 42 }}
-      dpr={[1, 2]}
-      gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-      frameloop={reduced ? "demand" : "always"}
-    >
-      <GlobeScene reduced={reduced} dots={dots} />
-    </Canvas>
+    <div ref={wrapRef} className="m-gl-fill">
+      <Canvas
+        camera={{ position: [0, 0.35, 3.0], fov: 42 }}
+        dpr={[1, 2]}
+        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+        frameloop={reduced || !active ? "demand" : "always"}
+      >
+        <GlobeScene reduced={reduced} dots={dots} />
+      </Canvas>
+    </div>
   );
 }

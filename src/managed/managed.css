@@ -454,6 +454,39 @@
   }
 }
 
+/* Fills its positioned parent — wraps the R3F <Canvas>. */
+.m-gl-fill {
+  position: absolute;
+  inset: 0;
+}
+
+/* Progressive-enhancement globe: capable devices lazy-load the live
+   3D globe (fades in); everyone else gets the static poster — an
+   image, no Three.js. */
+.m-globe-live {
+  position: absolute;
+  inset: 0;
+  animation: globeFade 1.2s ease forwards;
+}
+.m-globe-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  animation: globeFade 0.8s ease forwards;
+}
+
+/* Static poster for the orbit model (How it works / onboarding). */
+.m-how-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  animation: globeFade 0.8s ease forwards;
+}
+
 .m-float-card {
   position: absolute;
   z-index: 3;

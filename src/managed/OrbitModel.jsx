@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -244,15 +244,33 @@ function Scene({ steps, active, reduced }) {
   );
 }
 
-export default function OrbitModel({ steps, active = 0, reduced = false }) {
+export default function OrbitModel({ steps, active = 0, reduced = false, onReady }) {
+  const [inView, setInView] = useState(true);
+  const wrapRef = useRef(null);
+
+  // Pause the render loop when the model scrolls off-screen (INP).
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { rootMargin: "100px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <Canvas
-      camera={{ position: [0, 0, 4.4], fov: 42 }}
-      dpr={[1, 2]}
-      gl={{ antialias: true, alpha: true }}
-      frameloop={reduced ? "demand" : "always"}
-    >
-      <Scene steps={steps} active={active} reduced={reduced} />
-    </Canvas>
+    <div ref={wrapRef} className="m-gl-fill">
+      <Canvas
+        camera={{ position: [0, 0, 4.4], fov: 42 }}
+        dpr={[1, 2]}
+        gl={{ antialias: true, alpha: true }}
+        frameloop={reduced || !inView ? "demand" : "always"}
+        onCreated={() => onReady?.()}
+      >
+        <Scene steps={steps} active={active} reduced={reduced} />
+      </Canvas>
+    </div>
   );
 }

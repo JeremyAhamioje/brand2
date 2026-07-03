@@ -8,3 +8,6 @@ dist
 .env.*
 !.env.example
 .vercel
+
+# Tooling scratch
+.playwright-mcp

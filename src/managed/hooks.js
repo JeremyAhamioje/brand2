@@ -67,6 +67,44 @@ export function useCountUp(end, active, duration = 1600) {
   return value;
 }
 
+// Decides whether to load the heavy interactive 3D (Three.js) or
+// fall back to a static poster image. We only enable it on devices
+// likely to handle it well: a large screen, motion allowed, WebGL
+// present, a fast connection, and not data-saver. Phones, low-end,
+// and save-data users get the poster and never download Three.js —
+// nor even the poster on capable devices. Computed synchronously on
+// first render (this is a client-rendered SPA, so no hydration
+// mismatch) so the right path renders immediately.
+function computeEnable3D() {
+  if (typeof window === "undefined") return false;
+  const mq = (q) => window.matchMedia && window.matchMedia(q).matches;
+
+  const reduced = mq("(prefers-reduced-motion: reduce)");
+  const small = mq("(max-width: 900px)");
+  const conn = navigator.connection || {};
+  const saveData = !!conn.saveData;
+  const slow = /(^|-)2g|3g$/.test(conn.effectiveType || "");
+  const mem = navigator.deviceMemory;
+  const lowMem = typeof mem === "number" && mem <= 2;
+
+  let webgl = false;
+  try {
+    const c = document.createElement("canvas");
+    webgl = !!(
+      window.WebGLRenderingContext &&
+      (c.getContext("webgl") || c.getContext("experimental-webgl"))
+    );
+  } catch {
+    webgl = false;
+  }
+
+  return webgl && !reduced && !small && !saveData && !slow && !lowMem;
+}
+
+export function useEnable3D() {
+  return useState(computeEnable3D)[0];
+}
+
 // Tracks whether the window has scrolled past `y` (for the frosted navbar).
 export function useScrolled(y = 12) {
   const [scrolled, setScrolled] = useState(false);

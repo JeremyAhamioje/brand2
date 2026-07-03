@@ -1,17 +1,20 @@
 import { Suspense, lazy } from "react";
 import { useModel } from "../context/ModelContext.jsx";
 import { BOOKING_URL } from "../data/content.js";
-import { usePrefersReducedMotion } from "./hooks.js";
+import { usePrefersReducedMotion, useEnable3D } from "./hooks.js";
 import { CheckIcon, ArrowRight } from "../components/icons.jsx";
+import globePoster from "./assets/globe-poster.png";
 
-// The globe is heavy (Three.js) so it's code-split and only loads
-// on the managed page, behind a lightweight glowing fallback.
+// The globe is heavy (Three.js). It's code-split AND only mounted on
+// capable devices — phones, low-end, and data-saver users get the
+// static poster below and never download Three.js at all.
 const Globe = lazy(() => import("./Globe.jsx"));
 
 export default function ManagedHero() {
   const { content } = useModel();
   const { hero } = content;
   const reduced = usePrefersReducedMotion();
+  const enable3D = useEnable3D();
   const bookHref = BOOKING_URL || "#book";
   const bookProps = BOOKING_URL
     ? { target: "_blank", rel: "noopener noreferrer" }
@@ -27,11 +30,22 @@ export default function ManagedHero() {
 
       <div className="m-hero-globe">
         <div className="m-globe-wrap">
-          <Suspense fallback={<div className="m-globe-fallback" />}>
-            <div className="m-globe-canvas">
-              <Globe reduced={reduced} />
-            </div>
-          </Suspense>
+          {enable3D ? (
+            <Suspense fallback={<div className="m-globe-fallback" />}>
+              <div className="m-globe-live">
+                <Globe reduced={reduced} />
+              </div>
+            </Suspense>
+          ) : (
+            <img
+              className="m-globe-poster"
+              src={globePoster}
+              alt="A US client connected to talent hubs in Nigeria, India, and the Philippines"
+              width="720"
+              height="720"
+              loading="eager"
+            />
+          )}
         </div>
       </div>
 
