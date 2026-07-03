@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useModel } from "../context/ModelContext.jsx";
 import Reveal from "./Reveal.jsx";
 import { BookLink } from "./booking.jsx";
+import BrandLogo from "./BrandLogo.jsx";
 import { CheckIcon, ArrowRight, ShieldIcon, Chevron } from "../components/icons.jsx";
 
 // Same set of inclusions applies to every managed plan.
@@ -423,9 +424,8 @@ export function Footer() {
       <div className="m-container">
         <div className="m-footer-grid">
           <div className="m-footer-col">
-            <span className="m-brand">
-              <span className="m-brand-dot" />
-              {content.name}
+            <span className="m-brand" aria-label={content.name}>
+              <BrandLogo />
             </span>
             <p className="m-footer-blurb">
               Global talent, locally managed. We recruit, onboard, pay, and

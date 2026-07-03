@@ -1,6 +1,7 @@
 import { useModel } from "../context/ModelContext.jsx";
 import { useScrolled } from "./hooks.js";
 import { BookLink } from "./booking.jsx";
+import BrandLogo from "./BrandLogo.jsx";
 import { ArrowRight } from "../components/icons.jsx";
 
 // Managed-product navbar. Becomes frosted glass once the page is
@@ -12,9 +13,8 @@ export default function ManagedNav() {
   return (
     <nav className={`m-nav ${scrolled ? "scrolled" : ""}`}>
       <div className="m-container m-nav-inner">
-        <a href="#top" className="m-brand">
-          <span className="m-brand-dot" />
-          {content.name}
+        <a href="#top" className="m-brand" aria-label={content.name}>
+          <BrandLogo />
         </a>
 
         <div className="m-nav-links">

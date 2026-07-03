@@ -8,7 +8,7 @@
 
 export const fullyManaged = {
   id: "managed",
-  name: "BRAND 2",
+  name: "Level Up Hiring",
 
   // -- SECTION 1: Hero ---------------------------------------
   hero: {
