@@ -1,5 +1,6 @@
 import { Suspense, lazy, useEffect, useState } from "react";
 import { usePrefersReducedMotion, useEnable3D } from "./hooks.js";
+import { useTheme } from "../context/ThemeContext.jsx";
 import Reveal from "./Reveal.jsx";
 import ManagedNav from "./ManagedNav.jsx";
 import { Footer } from "./Conversion.jsx";
@@ -8,6 +9,7 @@ import StickyBook from "./StickyBook.jsx";
 import { BookLink } from "./booking.jsx";
 import { ArrowRight, CheckIcon } from "../components/icons.jsx";
 import orbitPoster from "./assets/orbit-poster.png";
+import orbitPosterLight from "./assets/orbit-poster-light.png";
 
 const OrbitModel = lazy(() => import("./OrbitModel.jsx"));
 
@@ -48,6 +50,7 @@ const PHASES = [
 export default function OnboardingPage() {
   const reduced = usePrefersReducedMotion();
   const enable3D = useEnable3D();
+  const { theme } = useTheme();
   const [active, setActive] = useState(0);
 
   // Gently cycle the orbit highlight in the hero (only when the 3D
@@ -103,12 +106,13 @@ export default function OnboardingPage() {
                   steps={PHASES.map((p) => p.short)}
                   active={active}
                   reduced={reduced}
+                  theme={theme}
                 />
               </Suspense>
             ) : (
               <img
                 className="m-how-poster"
-                src={orbitPoster}
+                src={theme === "light" ? orbitPosterLight : orbitPoster}
                 alt="Onboarding process shown as concentric orbits"
                 loading="lazy"
               />

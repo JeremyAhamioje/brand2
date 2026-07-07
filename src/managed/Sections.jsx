@@ -1,6 +1,7 @@
 import { lazy, Suspense, useState } from "react";
 import { useModel } from "../context/ModelContext.jsx";
 import { useCountUp, useInView, usePrefersReducedMotion, useEnable3D } from "./hooks.js";
+import { useTheme } from "../context/ThemeContext.jsx";
 import Reveal from "./Reveal.jsx";
 import { CheckIcon, ArrowRight } from "../components/icons.jsx";
 
@@ -18,6 +19,7 @@ import role2 from "./assets/roles/role2.webp";
 import role3 from "./assets/roles/role3.webp";
 import roleInfra from "./assets/roles/infra.webp";
 import orbitPoster from "./assets/orbit-poster.png";
+import orbitPosterLight from "./assets/orbit-poster-light.png";
 
 const ROLE_SHOTS = [role1, role2, role3];
 
@@ -318,6 +320,7 @@ export function HowItWorks() {
   const { how } = content;
   const reduced = usePrefersReducedMotion();
   const enable3D = useEnable3D();
+  const { theme } = useTheme();
   const [active, setActive] = useState(0);
   const shorts = how.steps.map((s) => s.short);
 
@@ -365,12 +368,12 @@ export function HowItWorks() {
           <span className="m-how-mark c">+</span>
           {enable3D ? (
             <Suspense fallback={<div className="m-how-fallback" />}>
-              <OrbitModel steps={shorts} active={active} reduced={reduced} />
+              <OrbitModel steps={shorts} active={active} reduced={reduced} theme={theme} />
             </Suspense>
           ) : (
             <img
               className="m-how-poster"
-              src={orbitPoster}
+              src={theme === "light" ? orbitPosterLight : orbitPoster}
               alt="Onboarding process shown as concentric orbits"
               loading="lazy"
             />

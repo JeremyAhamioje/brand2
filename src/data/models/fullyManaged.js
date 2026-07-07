@@ -16,7 +16,7 @@ export const fullyManaged = {
     headline:
       "A dedicated remote professional, fully managed — for one flat monthly price.",
     subhead:
-      "We recruit, vet, onboard, pay, and manage a dedicated team member who works only for you. Payroll, HR, and performance are handled. You direct the work; we run everything behind it.",
+      "A dedicated professional, recruited and fully managed for you — payroll, HR, and performance handled. You direct the work; we run the rest.",
     secondaryCta: { label: "See pricing", href: "#pricing" },
     trust: [
       "Flat monthly pricing",

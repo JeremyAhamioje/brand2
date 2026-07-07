@@ -4,6 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <!-- Apply the saved theme before first paint to avoid a flash. -->
+    <script>
+      (function () {
+        try {
+          document.documentElement.setAttribute(
+            "data-theme",
+            localStorage.getItem("luh-theme") || "dark"
+          );
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
+
     <title>Level Up Hiring — Global talent, one managed team</title>
     <meta
       name="description"

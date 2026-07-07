@@ -6,35 +6,58 @@ import * as THREE from "three";
 // ORBIT MODEL (React Three Fiber)
 // A pulsating central "spark" orbited by tilted rings. Each step
 // owns one ring + node; the active step (driven from the list on
-// the left) lights its ring blue and brightens its label.
+// the left) lights its ring blue and brightens its label. Themed
+// for dark and light (cream) UIs.
 // ============================================================
 
-const COL = {
-  line: "#8a93a8",
-  spark: "#f5f3ea",
-  accent: "#3b5bff",
-  node: "#e8e9ee",
+const PALETTE = {
+  dark: {
+    line: "#8a93a8",
+    spark: "#f5f3ea",
+    accent: "#3b5bff",
+    node: "#e8e9ee",
+    label: "#ffffff",
+    glow: true,
+    glowStops: [
+      [0, "rgba(255,255,255,0.9)"],
+      [0.4, "rgba(220,230,255,0.35)"],
+      [1, "rgba(255,255,255,0)"],
+    ],
+  },
+  light: {
+    line: "#8894ad",
+    spark: "#20263a",
+    accent: "#3f63e6",
+    node: "#4a5266",
+    label: "#20263a",
+    glow: false,
+    glowStops: [
+      [0, "rgba(63,99,230,0.3)"],
+      [0.45, "rgba(63,99,230,0.12)"],
+      [1, "rgba(63,99,230,0)"],
+    ],
+  },
 };
+
+const blendOf = (glow) => (glow ? THREE.AdditiveBlending : THREE.NormalBlending);
 
 const GROUP_ROT = [-1.02, 0, 0.32];
 
 // --- textures ----------------------------------------------
-function useGlowTexture() {
+function useGlowTexture(p) {
   return useMemo(() => {
     const c = document.createElement("canvas");
     c.width = c.height = 128;
     const ctx = c.getContext("2d");
     const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
-    g.addColorStop(0, "rgba(255,255,255,0.9)");
-    g.addColorStop(0.4, "rgba(220,230,255,0.35)");
-    g.addColorStop(1, "rgba(255,255,255,0)");
+    p.glowStops.forEach(([o, col]) => g.addColorStop(o, col));
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, 128, 128);
     return new THREE.CanvasTexture(c);
-  }, []);
+  }, [p]);
 }
 
-function makeLabelTexture(text) {
+function makeLabelTexture(text, color) {
   const scale = 2;
   const w = 256;
   const h = 72;
@@ -45,7 +68,7 @@ function makeLabelTexture(text) {
   ctx.scale(scale, scale);
   ctx.textBaseline = "middle";
   ctx.textAlign = "center";
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = color;
   ctx.font = "600 30px 'Hanken Grotesk', Inter, Arial, sans-serif";
   ctx.fillText(text, w / 2, h / 2);
   const tex = new THREE.CanvasTexture(c);
@@ -64,15 +87,15 @@ function sparkleShape(outer, ctrl) {
   return s;
 }
 
-function Spark({ reduced }) {
+function Spark({ reduced, p }) {
   const star = useRef();
   const glow = useRef();
-  const glowTex = useGlowTexture();
+  const glowTex = useGlowTexture(p);
   const geom = useMemo(() => new THREE.ShapeGeometry(sparkleShape(0.24, 0.06)), []);
   useFrame((st) => {
     const t = st.clock.getElapsedTime();
-    const p = reduced ? 1 : 1 + Math.sin(t * 2.3) * 0.12;
-    if (star.current) star.current.scale.setScalar(p);
+    const pulse = reduced ? 1 : 1 + Math.sin(t * 2.3) * 0.12;
+    if (star.current) star.current.scale.setScalar(pulse);
     if (glow.current) {
       const gp = reduced ? 3 : 3 + Math.sin(t * 2.3) * 0.5;
       glow.current.scale.setScalar(gp);
@@ -87,11 +110,11 @@ function Spark({ reduced }) {
           transparent
           opacity={0.6}
           depthWrite={false}
-          blending={THREE.AdditiveBlending}
+          blending={blendOf(p.glow)}
         />
       </sprite>
       <mesh ref={star} geometry={geom}>
-        <meshBasicMaterial color={COL.spark} side={THREE.DoubleSide} toneMapped={false} />
+        <meshBasicMaterial color={p.spark} side={THREE.DoubleSide} toneMapped={false} />
       </mesh>
     </group>
   );
@@ -107,9 +130,9 @@ function ringGeometry(radius, segments = 160) {
   return new THREE.BufferGeometry().setFromPoints(pts);
 }
 
-function Orbit({ radius, angle, label, active, reduced }) {
+function Orbit({ radius, angle, label, active, reduced, p }) {
   const lineGeom = useMemo(() => ringGeometry(radius), [radius]);
-  const labelTex = useMemo(() => makeLabelTexture(label), [label]);
+  const labelTex = useMemo(() => makeLabelTexture(label, p.label), [label, p]);
   const nodePos = useMemo(() => {
     const a = (angle * Math.PI) / 180;
     return [Math.cos(a) * radius, Math.sin(a) * radius, 0];
@@ -139,7 +162,7 @@ function Orbit({ radius, angle, label, active, reduced }) {
       {/* base thin ring */}
       <line geometry={lineGeom}>
         <lineBasicMaterial
-          color={COL.line}
+          color={p.line}
           transparent
           opacity={active ? 0.85 : 0.28}
           depthWrite={false}
@@ -150,10 +173,10 @@ function Orbit({ radius, angle, label, active, reduced }) {
       <mesh ref={glow} rotation={[0, 0, 0]}>
         <torusGeometry args={[radius, 0.02, 12, 180]} />
         <meshBasicMaterial
-          color={COL.accent}
+          color={p.accent}
           transparent
           opacity={active ? 0.5 : 0}
-          blending={THREE.AdditiveBlending}
+          blending={blendOf(p.glow)}
           depthWrite={false}
         />
       </mesh>
@@ -161,7 +184,7 @@ function Orbit({ radius, angle, label, active, reduced }) {
       {/* node */}
       <mesh ref={node} position={nodePos}>
         <sphereGeometry args={[0.028, 16, 16]} />
-        <meshBasicMaterial color={active ? COL.accent : COL.node} toneMapped={false} />
+        <meshBasicMaterial color={active ? p.accent : p.node} toneMapped={false} />
       </mesh>
 
       {/* label */}
@@ -179,7 +202,7 @@ function Orbit({ radius, angle, label, active, reduced }) {
 }
 
 // slowly drifting particle on a ring — keeps the model alive
-function OrbitDot({ radius, speed, offset, reduced }) {
+function OrbitDot({ radius, speed, offset, reduced, p }) {
   const ref = useRef();
   useFrame((st) => {
     if (reduced || !ref.current) return;
@@ -193,10 +216,10 @@ function OrbitDot({ radius, speed, offset, reduced }) {
     <mesh ref={ref} position={start}>
       <sphereGeometry args={[0.014, 10, 10]} />
       <meshBasicMaterial
-        color={COL.accent}
+        color={p.accent}
         transparent
         opacity={0.9}
-        blending={THREE.AdditiveBlending}
+        blending={blendOf(p.glow)}
         depthWrite={false}
         toneMapped={false}
       />
@@ -204,7 +227,7 @@ function OrbitDot({ radius, speed, offset, reduced }) {
   );
 }
 
-function Scene({ steps, active, reduced }) {
+function Scene({ steps, active, reduced, p }) {
   const n = steps.length;
   const orbits = useMemo(
     () =>
@@ -218,7 +241,7 @@ function Scene({ steps, active, reduced }) {
 
   return (
     <group position={[-0.35, 0, 0]}>
-      <Spark reduced={reduced} />
+      <Spark reduced={reduced} p={p} />
       <group rotation={GROUP_ROT}>
         {orbits.map((o, i) => (
           <Orbit
@@ -228,6 +251,7 @@ function Scene({ steps, active, reduced }) {
             label={o.label}
             active={active === i}
             reduced={reduced}
+            p={p}
           />
         ))}
         {orbits.map((o, i) => (
@@ -237,6 +261,7 @@ function Scene({ steps, active, reduced }) {
             speed={0.18 + i * 0.02}
             offset={(i / n) * Math.PI * 2 + 2.2}
             reduced={reduced}
+            p={p}
           />
         ))}
       </group>
@@ -244,9 +269,16 @@ function Scene({ steps, active, reduced }) {
   );
 }
 
-export default function OrbitModel({ steps, active = 0, reduced = false, onReady }) {
+export default function OrbitModel({
+  steps,
+  active = 0,
+  reduced = false,
+  onReady,
+  theme = "dark",
+}) {
   const [inView, setInView] = useState(true);
   const wrapRef = useRef(null);
+  const p = PALETTE[theme] || PALETTE.dark;
 
   // Pause the render loop when the model scrolls off-screen (INP).
   useEffect(() => {
@@ -269,7 +301,7 @@ export default function OrbitModel({ steps, active = 0, reduced = false, onReady
         frameloop={reduced || !inView ? "demand" : "always"}
         onCreated={() => onReady?.()}
       >
-        <Scene steps={steps} active={active} reduced={reduced} />
+        <Scene key={theme} steps={steps} active={active} reduced={reduced} p={p} />
       </Canvas>
     </div>
   );

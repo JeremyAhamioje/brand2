@@ -1,9 +1,11 @@
 import { Suspense, lazy } from "react";
 import { useModel } from "../context/ModelContext.jsx";
+import { useTheme } from "../context/ThemeContext.jsx";
 import { usePrefersReducedMotion, useEnable3D } from "./hooks.js";
 import { BookLink } from "./booking.jsx";
 import { CheckIcon, ArrowRight } from "../components/icons.jsx";
 import globePoster from "./assets/globe-poster.png";
+import globePosterLight from "./assets/globe-poster-light.png";
 
 // The globe is heavy (Three.js). It's code-split AND only mounted on
 // capable devices — phones, low-end, and data-saver users get the
@@ -15,6 +17,8 @@ export default function ManagedHero() {
   const { hero } = content;
   const reduced = usePrefersReducedMotion();
   const enable3D = useEnable3D();
+  const { theme } = useTheme();
+  const poster = theme === "light" ? globePosterLight : globePoster;
 
   return (
     <header className="m-hero" id="top">
@@ -29,13 +33,13 @@ export default function ManagedHero() {
           {enable3D ? (
             <Suspense fallback={<div className="m-globe-fallback" />}>
               <div className="m-globe-live">
-                <Globe reduced={reduced} />
+                <Globe reduced={reduced} theme={theme} />
               </div>
             </Suspense>
           ) : (
             <img
               className="m-globe-poster"
-              src={globePoster}
+              src={poster}
               alt="A US client connected to talent hubs in Nigeria, India, and the Philippines"
               width="720"
               height="720"
@@ -55,17 +59,16 @@ export default function ManagedHero() {
           </h1>
         </div>
 
-        <div className="m-hero-bl">
-          {hero.trust.map((badge) => (
-            <span className="m-badge" key={badge}>
-              <CheckIcon size={15} />
-              {badge}
-            </span>
-          ))}
-        </div>
-
         <div className="m-hero-br">
           <p className="m-hero-sub">{hero.subhead}</p>
+          <div className="m-hero-badges">
+            {hero.trust.map((badge) => (
+              <span className="m-badge" key={badge}>
+                <CheckIcon size={15} />
+                {badge}
+              </span>
+            ))}
+          </div>
           <div className="m-hero-actions">
             <BookLink className="m-btn m-btn-primary m-btn-lg">
               Book a 15-minute call <ArrowRight />

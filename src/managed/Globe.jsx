@@ -10,7 +10,9 @@ import earthUrl from "./assets/earth-dark.jpg";
 // dots sampled from an Earth land map (no grid lines), a soft
 // atmosphere, connected talent nodes labelled by country, and
 // particles flowing along great-circle arcs from the client (US)
-// to each talent hub.
+// to each talent hub. Themed for both dark and light (cream) UIs —
+// the light palette drops the additive "glow" blending (which is
+// invisible on a light ground) for solid materials.
 // ============================================================
 
 const R = 1;
@@ -23,14 +25,44 @@ const TALENT = [
   { name: "PHILIPPINES", role: "TALENT HUB", lat: 12.88, lon: 121.77, t: 1.9, draw: 2.0 },
 ];
 
-const COLORS = {
-  base: "#070c1a",
-  land: "#7c9fe0",
-  atmosphere: "#3b6bff",
-  client: "#8fb4ff",
-  talent: "#5df2a0",
-  arc: "#6b93ff",
+const PALETTE = {
+  dark: {
+    base: "#070c1a",
+    land: "#7c9fe0",
+    landOpacity: 0.92,
+    atmosphere: "#3b6bff",
+    client: "#8fb4ff",
+    talent: "#5df2a0",
+    arc: "#6b93ff",
+    haloOpacity: 0.32,
+    glow: true,
+    label: {
+      bg: "rgba(8,12,22,0.92)",
+      border: "rgba(120,150,235,0.45)",
+      name: "#ffffff",
+      sub: "rgba(160,180,220,0.85)",
+    },
+  },
+  light: {
+    base: "#e7edf6",
+    land: "#3f5fa8",
+    landOpacity: 0.95,
+    atmosphere: "#9fbdf0",
+    client: "#274fbf",
+    talent: "#0f8f54",
+    arc: "#3f63e6",
+    haloOpacity: 0.16,
+    glow: false,
+    label: {
+      bg: "rgba(255,255,255,0.94)",
+      border: "rgba(63,99,230,0.4)",
+      name: "#16181f",
+      sub: "rgba(60,66,80,0.82)",
+    },
+  },
 };
+
+const blendOf = (glow) => (glow ? THREE.AdditiveBlending : THREE.NormalBlending);
 
 // --- math helpers ------------------------------------------
 function latLonToVec3(lat, lon, r) {
@@ -94,7 +126,7 @@ function buildLandDots(image, { rows = 180, threshold = 22 } = {}) {
 }
 
 // Country label rendered to a canvas texture (crisp block + text).
-function makeLabelTexture(name, sub, dotColor) {
+function makeLabelTexture(name, sub, dotColor, label) {
   const scale = 2;
   const w = 300;
   const h = 96;
@@ -116,10 +148,10 @@ function makeLabelTexture(name, sub, dotColor) {
   ctx.arcTo(bx, by + bh, bx, by, r);
   ctx.arcTo(bx, by, bx + bw, by, r);
   ctx.closePath();
-  ctx.fillStyle = "rgba(8,12,22,0.92)";
+  ctx.fillStyle = label.bg;
   ctx.fill();
   ctx.lineWidth = 1.5;
-  ctx.strokeStyle = "rgba(120,150,235,0.45)";
+  ctx.strokeStyle = label.border;
   ctx.stroke();
 
   // status dot
@@ -132,10 +164,10 @@ function makeLabelTexture(name, sub, dotColor) {
   ctx.shadowBlur = 0;
 
   ctx.textBaseline = "middle";
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = label.name;
   ctx.font = "700 21px 'Hanken Grotesk', Inter, Arial, sans-serif";
   ctx.fillText(name, bx + 40, by + bh / 2 - 8);
-  ctx.fillStyle = "rgba(160,180,220,0.85)";
+  ctx.fillStyle = label.sub;
   ctx.font = "600 12px 'Hanken Grotesk', Inter, Arial, sans-serif";
   ctx.fillText(sub, bx + 40, by + bh / 2 + 11);
 
@@ -170,7 +202,7 @@ function Controls({ autoRotate }) {
   return null;
 }
 
-// --- atmosphere (fresnel glow) -----------------------------
+// --- atmosphere (fresnel rim) ------------------------------
 const atmVertex = `
   varying vec3 vNormal;
   void main() {
@@ -185,10 +217,10 @@ const atmFragment = `
     gl_FragColor = vec4(uColor, 1.0) * intensity;
   }`;
 
-function Atmosphere() {
+function Atmosphere({ p }) {
   const uniforms = useMemo(
-    () => ({ uColor: { value: new THREE.Color(COLORS.atmosphere) } }),
-    []
+    () => ({ uColor: { value: new THREE.Color(p.atmosphere) } }),
+    [p]
   );
   return (
     <mesh scale={1.16}>
@@ -197,7 +229,7 @@ function Atmosphere() {
         vertexShader={atmVertex}
         fragmentShader={atmFragment}
         uniforms={uniforms}
-        blending={THREE.AdditiveBlending}
+        blending={blendOf(p.glow)}
         side={THREE.BackSide}
         transparent
         depthWrite={false}
@@ -207,7 +239,7 @@ function Atmosphere() {
 }
 
 // --- dotted continents -------------------------------------
-function DotEarth({ positions }) {
+function DotEarth({ positions, p }) {
   const geometry = useMemo(() => {
     const g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.BufferAttribute(positions, 3));
@@ -216,11 +248,11 @@ function DotEarth({ positions }) {
   return (
     <points geometry={geometry}>
       <pointsMaterial
-        color={COLORS.land}
+        color={p.land}
         size={0.0095}
         sizeAttenuation
         transparent
-        opacity={0.92}
+        opacity={p.landOpacity}
         depthWrite={false}
       />
     </points>
@@ -228,7 +260,7 @@ function DotEarth({ positions }) {
 }
 
 // --- glowing node ------------------------------------------
-function Node({ position, color, size, appearTime, reduced }) {
+function Node({ position, color, size, appearTime, reduced, p }) {
   const group = useRef();
   const halo = useRef();
   useFrame((state) => {
@@ -238,7 +270,7 @@ function Node({ position, color, size, appearTime, reduced }) {
     if (halo.current && !reduced) {
       const pulse = 1 + Math.sin(t * 2.1 + appearTime) * 0.22;
       halo.current.scale.setScalar(pulse);
-      halo.current.material.opacity = 0.3 + Math.sin(t * 2.1 + appearTime) * 0.14;
+      halo.current.material.opacity = p.haloOpacity + Math.sin(t * 2.1 + appearTime) * 0.14;
     }
   });
   return (
@@ -252,8 +284,8 @@ function Node({ position, color, size, appearTime, reduced }) {
         <meshBasicMaterial
           color={color}
           transparent
-          opacity={0.32}
-          blending={THREE.AdditiveBlending}
+          opacity={p.haloOpacity}
+          blending={blendOf(p.glow)}
           depthWrite={false}
         />
       </mesh>
@@ -262,12 +294,12 @@ function Node({ position, color, size, appearTime, reduced }) {
 }
 
 // --- country label (billboard, hidden on far side) ---------
-function GeoLabel({ node, color, reduced }) {
+function GeoLabel({ node, color, reduced, p }) {
   const ref = useRef();
   const camera = useThree((s) => s.camera);
   const texture = useMemo(
-    () => makeLabelTexture(node.name, node.role, color),
-    [node.name, node.role, color]
+    () => makeLabelTexture(node.name, node.role, color, p.label),
+    [node.name, node.role, color, p]
   );
   const anchor = useMemo(
     () => latLonToVec3(node.lat, node.lon, R * 1.12),
@@ -297,7 +329,7 @@ function GeoLabel({ node, color, reduced }) {
 }
 
 // --- arc that draws in --------------------------------------
-function Arc({ curve, drawStart, reduced }) {
+function Arc({ curve, drawStart, reduced, p }) {
   const geometry = useMemo(() => {
     const pts = curve.getPoints(120);
     const g = new THREE.BufferGeometry().setFromPoints(pts);
@@ -308,16 +340,16 @@ function Arc({ curve, drawStart, reduced }) {
   useFrame((state) => {
     if (reduced) return;
     const t = state.clock.getElapsedTime();
-    const p = THREE.MathUtils.clamp((t - drawStart) / 0.8, 0, 1);
-    geometry.setDrawRange(0, Math.floor(p * geometry.userData.count));
+    const prog = THREE.MathUtils.clamp((t - drawStart) / 0.8, 0, 1);
+    geometry.setDrawRange(0, Math.floor(prog * geometry.userData.count));
   });
   return (
     <line geometry={geometry}>
       <lineBasicMaterial
-        color={COLORS.arc}
+        color={p.arc}
         transparent
         opacity={0.85}
-        blending={THREE.AdditiveBlending}
+        blending={blendOf(p.glow)}
         depthWrite={false}
       />
     </line>
@@ -325,7 +357,7 @@ function Arc({ curve, drawStart, reduced }) {
 }
 
 // --- particles flowing along an arc ------------------------
-function Flow({ curve, startTime, reduced, count = 10, speed = 0.14 }) {
+function Flow({ curve, startTime, reduced, p, count = 10, speed = 0.14 }) {
   const ref = useRef();
   const offsets = useMemo(
     () => Array.from({ length: count }, (_, i) => i / count),
@@ -334,10 +366,10 @@ function Flow({ curve, startTime, reduced, count = 10, speed = 0.14 }) {
   const geometry = useMemo(() => {
     const positions = new Float32Array(count * 3);
     offsets.forEach((o, i) => {
-      const p = curve.getPoint(o);
-      positions[i * 3] = p.x;
-      positions[i * 3 + 1] = p.y;
-      positions[i * 3 + 2] = p.z;
+      const pt = curve.getPoint(o);
+      positions[i * 3] = pt.x;
+      positions[i * 3 + 1] = pt.y;
+      positions[i * 3 + 2] = pt.z;
     });
     const g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.BufferAttribute(positions, 3));
@@ -349,29 +381,29 @@ function Flow({ curve, startTime, reduced, count = 10, speed = 0.14 }) {
     const attr = ref.current.geometry.attributes.position;
     for (let i = 0; i < count; i++) {
       const tt = ((t - startTime) * speed + offsets[i]) % 1;
-      const p = curve.getPoint(tt < 0 ? 0 : tt);
-      attr.array[i * 3] = p.x;
-      attr.array[i * 3 + 1] = p.y;
-      attr.array[i * 3 + 2] = p.z;
+      const pt = curve.getPoint(tt < 0 ? 0 : tt);
+      attr.array[i * 3] = pt.x;
+      attr.array[i * 3 + 1] = pt.y;
+      attr.array[i * 3 + 2] = pt.z;
     }
     attr.needsUpdate = true;
   });
   return (
     <points ref={ref} geometry={geometry}>
       <pointsMaterial
-        color={COLORS.talent}
+        color={p.talent}
         size={0.03}
         sizeAttenuation
         transparent
         opacity={0.95}
-        blending={THREE.AdditiveBlending}
+        blending={blendOf(p.glow)}
         depthWrite={false}
       />
     </points>
   );
 }
 
-function GlobeScene({ reduced, dots }) {
+function GlobeScene({ reduced, dots, p }) {
   const [hovered, setHovered] = useState(false);
   const clientPos = useMemo(() => latLonToVec3(CLIENT.lat, CLIENT.lon, R * 1.01), []);
   const routes = useMemo(
@@ -392,33 +424,35 @@ function GlobeScene({ reduced, dots }) {
         onPointerOut={() => setHovered(false)}
       >
         <sphereGeometry args={[R, 64, 64]} />
-        <meshBasicMaterial color={COLORS.base} />
+        <meshBasicMaterial color={p.base} />
       </mesh>
 
-      {dots && <DotEarth positions={dots} />}
-      <Atmosphere />
+      {dots && <DotEarth positions={dots} p={p} />}
+      <Atmosphere p={p} />
 
       <Node
         position={clientPos}
-        color={COLORS.client}
+        color={p.client}
         size={0.02}
         appearTime={CLIENT.t}
         reduced={reduced}
+        p={p}
       />
-      <GeoLabel node={CLIENT} color={COLORS.client} reduced={reduced} />
+      <GeoLabel node={CLIENT} color={p.client} reduced={reduced} p={p} />
 
       {routes.map((r) => (
         <group key={r.dest.name}>
           <Node
             position={r.pos}
-            color={COLORS.talent}
+            color={p.talent}
             size={0.018}
             appearTime={r.dest.t}
             reduced={reduced}
+            p={p}
           />
-          <GeoLabel node={r.dest} color={COLORS.talent} reduced={reduced} />
-          <Arc curve={r.curve} drawStart={r.dest.draw} reduced={reduced} />
-          <Flow curve={r.curve} startTime={r.dest.draw + 0.6} reduced={reduced} />
+          <GeoLabel node={r.dest} color={p.talent} reduced={reduced} p={p} />
+          <Arc curve={r.curve} drawStart={r.dest.draw} reduced={reduced} p={p} />
+          <Flow curve={r.curve} startTime={r.dest.draw + 0.6} reduced={reduced} p={p} />
         </group>
       ))}
 
@@ -428,12 +462,13 @@ function GlobeScene({ reduced, dots }) {
 }
 
 // Default export: loads + samples the land map, then renders the scene.
-export default function Globe({ reduced = false, onReady }) {
+export default function Globe({ reduced = false, onReady, theme = "dark" }) {
   const [dots, setDots] = useState(null);
   const [active, setActive] = useState(true);
   const wrapRef = useRef(null);
   const readyCb = useRef(onReady);
   readyCb.current = onReady;
+  const p = PALETTE[theme] || PALETTE.dark;
 
   useEffect(() => {
     let alive = true;
@@ -474,7 +509,8 @@ export default function Globe({ reduced = false, onReady }) {
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         frameloop={reduced || !active ? "demand" : "always"}
       >
-        <GlobeScene reduced={reduced} dots={dots} />
+        {/* remount the scene on theme change so materials rebuild */}
+        <GlobeScene key={theme} reduced={reduced} dots={dots} p={p} />
       </Canvas>
     </div>
   );
