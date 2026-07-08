@@ -2323,77 +2323,130 @@
 
 /* ============================================================
    LIGHT THEME  (data-theme="light" on <html>; toggled in the nav)
-   Base near-black sections flip to white; the cream ".m-light"
-   accent sections stay cream; text goes dark throughout. A couple
+   A layered warm-cream system: the hero/base sits on the lightest
+   cream, the navbar and every surface panel (What-we-do cards, the
+   infrastructure block, pricing, footer) drop to a darker cream so
+   they read with real contrast. Text goes near-pure-black. A couple
    of dark "spotlight" panels (the CTA card and the trust band) stay
    dark in both themes for contrast.
+
+   Cream scale:
+     #ece1cd  base / hero / scene background
+     #e0d2b7  surface panels (cards, infra, pricing, footer, navbar)
+     #d7c8a9  surface hover
    ============================================================ */
 :root[data-theme="light"] .managed {
-  --m-bg: #f4eee4;
-  --m-bg-2: #ece3d5;
-  --m-ink: #16181f;
-  --m-text: #3f424b;
-  --m-muted: #6b6e78;
-  --m-line: rgba(18, 20, 40, 0.1);
-  --m-line-2: rgba(18, 20, 40, 0.16);
-  --m-glass: rgba(18, 20, 40, 0.04);
-  --m-glass-2: rgba(18, 20, 40, 0.07);
+  --m-bg: #ece1cd;
+  --m-bg-2: #e3d6be;
+  --m-ink: #000000;
+  --m-text: #17181d;
+  --m-muted: #44474e;
+  --m-line: rgba(18, 20, 40, 0.14);
+  --m-line-2: rgba(18, 20, 40, 0.22);
+  --m-glass: rgba(18, 20, 40, 0.05);
+  --m-glass-2: rgba(18, 20, 40, 0.09);
   --m-accent: #3f63e6;
   --m-accent-2: #12a15f;
   --m-accent-ink: #ffffff;
+  --m-cream-surface: #e0d2b7;
+  --m-cream-surface-2: #d7c8a9;
 }
-/* the whole page is warm cream in light mode — accent sections match */
+/* accent sections share the base cream + darker text */
 :root[data-theme="light"] .m-light {
-  --m-ink: #16181f;
-  --m-text: #3f424b;
-  --m-muted: #6b6e78;
-  --m-line: rgba(18, 20, 40, 0.1);
-  --m-line-2: rgba(18, 20, 40, 0.16);
-  --m-glass: rgba(18, 20, 40, 0.04);
-  --m-glass-2: rgba(18, 20, 40, 0.07);
+  --m-ink: #000000;
+  --m-text: #17181d;
+  --m-muted: #44474e;
+  --m-line: rgba(18, 20, 40, 0.14);
+  --m-line-2: rgba(18, 20, 40, 0.22);
+  --m-glass: rgba(18, 20, 40, 0.05);
+  --m-glass-2: rgba(18, 20, 40, 0.09);
 }
-/* scroll background: uniform cream in light mode */
+/* scroll background: the lightest cream — the hero sits on this */
 :root[data-theme="light"] .m-scene-bg,
 :root[data-theme="light"] .m-scene-bg[data-bg="light"] {
-  background: #f4eee4;
+  background: #ece1cd;
 }
 
-/* primary buttons: white label on the deeper light-mode accent */
+/* primary buttons: white label on the light-mode accent */
 :root[data-theme="light"] .m-btn-primary {
   color: #ffffff;
 }
 :root[data-theme="light"] .m-btn-ghost:hover {
-  border-color: rgba(18, 20, 40, 0.26);
+  border-color: rgba(18, 20, 40, 0.3);
 }
 
-/* frosted navbar → light */
+/* navbar: a darker cream than the hero, shown at all times (not just on scroll) */
+:root[data-theme="light"] .m-nav {
+  background: #e0d2b7;
+  border-bottom-color: rgba(18, 20, 40, 0.1);
+}
 :root[data-theme="light"] .m-nav.scrolled {
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(224, 210, 183, 0.92);
+  border-bottom-color: rgba(18, 20, 40, 0.14);
 }
 /* logo art is dark — show it as-is (no white filter) on the light UI */
 :root[data-theme="light"] .m-brand-logo {
   filter: none;
 }
 
-/* hero copy: dark text with a soft light halo for legibility over the globe */
+/* hero copy: near-black with a soft cream halo for legibility over the globe */
 :root[data-theme="light"] .m-hero h1 {
-  text-shadow: 0 2px 28px rgba(244, 238, 228, 0.95);
+  text-shadow: 0 2px 26px rgba(236, 225, 205, 0.92);
+}
+/* "one managed team" — a much darker blue→green gradient */
+:root[data-theme="light"] .m-hero h1 .grad {
+  background: linear-gradient(100deg, #1a2e82, #0d5c39);
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 :root[data-theme="light"] .m-hero-sub {
-  color: #454a55;
-  text-shadow: 0 1px 16px rgba(244, 238, 228, 0.98);
+  color: #1b1d24;
+  text-shadow: 0 1px 14px rgba(236, 225, 205, 0.96);
 }
 :root[data-theme="light"] .m-badge {
-  color: #565b68;
-  text-shadow: 0 1px 12px rgba(244, 238, 228, 0.98);
+  color: #23262e;
+  text-shadow: 0 1px 12px rgba(236, 225, 205, 0.96);
 }
 
-/* industries marquee reads dark on white */
+/* industries marquee near the footer: pure black */
 :root[data-theme="light"] .m-marquee-item {
-  color: rgba(18, 20, 40, 0.42);
+  color: #000000;
 }
 :root[data-theme="light"] .m-marquee-row:hover .m-marquee-item {
-  color: rgba(18, 20, 40, 0.66);
+  color: #000000;
+}
+
+/* --- surface panels: a darker cream than their section --- */
+/* What-we-do cards */
+:root[data-theme="light"] .m-do-card {
+  background: var(--m-cream-surface);
+  border-color: rgba(18, 20, 40, 0.14);
+}
+:root[data-theme="light"] .m-do-card:hover {
+  background: var(--m-cream-surface-2);
+  border-color: rgba(18, 20, 40, 0.22);
+}
+/* "Built on our managed infrastructure" block */
+:root[data-theme="light"] .m-roles-infra {
+  background: var(--m-cream-surface);
+  border-color: rgba(18, 20, 40, 0.14);
+}
+/* pricing cards */
+:root[data-theme="light"] .m-price-card {
+  background: var(--m-cream-surface);
+  border-color: rgba(18, 20, 40, 0.14);
+}
+:root[data-theme="light"] .m-price-card.featured {
+  background: linear-gradient(180deg, rgba(63, 99, 230, 0.16), var(--m-cream-surface));
+  border-color: rgba(63, 99, 230, 0.5);
+}
+:root[data-theme="light"] .m-price-pop {
+  color: #ffffff;
+}
+/* footer: the darker cream band */
+:root[data-theme="light"] .m-footer {
+  background: var(--m-cream-surface);
+  border-top-color: rgba(18, 20, 40, 0.14);
 }
 
 /* dark spotlight panels stay dark in light mode (force white-on-dark tokens) */

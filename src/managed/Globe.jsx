@@ -44,10 +44,12 @@ const PALETTE = {
     },
   },
   light: {
-    base: "#e7edf6",
-    land: "#3f5fa8",
-    landOpacity: 0.95,
-    atmosphere: "#9fbdf0",
+    // Soft "moon" sphere (muted gray, not bright white) with darker
+    // continent dots for contrast on the cream page.
+    base: "#c8cbcb",
+    land: "#2e477c",
+    landOpacity: 0.96,
+    atmosphere: "#93a9c8",
     client: "#274fbf",
     talent: "#0f8f54",
     arc: "#3f63e6",
