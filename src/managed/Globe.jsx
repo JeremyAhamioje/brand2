@@ -511,8 +511,10 @@ export default function Globe({ reduced = false, onReady, theme = "dark" }) {
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         frameloop={reduced || !active ? "demand" : "always"}
       >
-        {/* remount the scene on theme change so materials rebuild */}
-        <GlobeScene key={theme} reduced={reduced} dots={dots} p={p} />
+        {/* Theme swaps update material colors/blending via props (no
+            remount) so toggling doesn't rebuild the whole scene — that
+            synchronous rebuild was blocking the toggle's paint (INP). */}
+        <GlobeScene reduced={reduced} dots={dots} p={p} />
       </Canvas>
     </div>
   );

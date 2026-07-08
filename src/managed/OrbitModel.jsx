@@ -301,7 +301,7 @@ export default function OrbitModel({
         frameloop={reduced || !inView ? "demand" : "always"}
         onCreated={() => onReady?.()}
       >
-        <Scene key={theme} steps={steps} active={active} reduced={reduced} p={p} />
+        <Scene steps={steps} active={active} reduced={reduced} p={p} />
       </Canvas>
     </div>
   );

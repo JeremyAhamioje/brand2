@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  startTransition,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 // Light / dark theme. The active theme is written to `data-theme` on
 // <html>; the CSS in managed.css keys off `:root[data-theme="light"]`.
@@ -29,8 +35,21 @@ export function ThemeProvider({ children }) {
     }
   }, [theme]);
 
-  const toggleTheme = () =>
-    setTheme((t) => (t === "light" ? "dark" : "light"));
+  // Flip the CSS theme synchronously for an instant, cheap repaint, then
+  // hand the React state change (which remounts the heavy WebGL globe +
+  // orbit scenes) to a transition so it can't block the click's next
+  // paint. Without this, the scene rebuild ran inside the click handler
+  // and blocked UI updates for ~800ms (poor INP).
+  const toggleTheme = () => {
+    const next = theme === "light" ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", next);
+    try {
+      localStorage.setItem(STORAGE_KEY, next);
+    } catch {
+      /* ignore storage failures (private mode, etc.) */
+    }
+    startTransition(() => setTheme(next));
+  };
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
